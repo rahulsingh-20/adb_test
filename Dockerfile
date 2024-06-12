@@ -15,13 +15,20 @@ RUN ln -s /bin/echo /bin/systemctl
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
 RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 RUN apt-get -y update
+RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 871920D1991BC93C
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+RUN apt-get update
+RUN apt-get install libssl1.1
 RUN apt-get install -y mongodb-org
 
 # Install Yarn
 RUN apt-get install -y yarn
 
 # Install PIP
-RUN easy_install pip
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3.8 get-pip.py
+# RUN easy_install pip
 
 
 ENV ENV_TYPE staging
