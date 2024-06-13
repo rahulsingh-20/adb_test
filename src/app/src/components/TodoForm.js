@@ -1,24 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
+import useForm from "../hooks/useForm";
 
 const TodoForm = ({ onAdd }) => {
-  const [text, setText] = useState("");
+  const [values, handleChange, reset] = useForm({ text: "" });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    fetch("http://localhost:8000/todos/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        onAdd();
-        setText("");
-      })
-      .catch((error) => console.error("Error adding todo:", error));
+    onAdd(values.text).then(() => reset());
   };
 
   return (
@@ -29,8 +17,9 @@ const TodoForm = ({ onAdd }) => {
           <label htmlFor="todo">ToDo: </label>
           <input
             type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            name="text"
+            value={values.text}
+            onChange={handleChange}
             placeholder="Enter todo"
             required
           />

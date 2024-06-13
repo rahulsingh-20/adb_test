@@ -13,6 +13,7 @@ This assignment has some changes in Dockerfile, depending upon the specific obst
 <ul>
 <li>The version of react-scripts has been upgraded in package.json to avoid createHash related errors.</li>
 <li>The lines 18 to 22 have been added to properly install mongodb-org. They are concerned with the installation of libssl1.1 and are specific to my system. For testing on another system, the Dockerfile from master may be used.</li>
+<li>The steps to install pip have also been changed.</li>
 </ul>
 
 ## Explaination of docker compose file
@@ -116,3 +117,12 @@ This file defines 3 services: `app`, `api` and `mongo`.
 
    The TodoListView class is a Django REST framework view that defines get and post methods for handling GET and POST requests.
    It calls methods from the TodoService to perform operations and handles DatabaseError exceptions by logging the errors and returning appropriate error responses to the client.
+
+   ## Modularity
+
+   I have made the code for the `app` container modular by breaking down all components and encapsulating specific pieces of functionality.
+
+   1. I have created different components like `TodoForm`, `TodoList` and `TodoItem` to encapsulate logic at each level.
+   2. I have moved custom hooks to separate files under `src/app/src/hooks`, so that they can be reused for future components as well.
+   3. I have created a separate `service` module to encapsulate the API logic, making it easire to manage and reuse. This allows us to easily update the API endpoint in one place if needed.
+   4. I have used css modules for style (`App.module.css`) to scope style to the component, avoiding style conflicts.
