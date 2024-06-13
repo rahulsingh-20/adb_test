@@ -54,3 +54,65 @@ This file defines 3 services: `app`, `api` and `mongo`.
    4. ports: Maps port 27017 on the host to port 27017 in the container.
    5. volumes: ${ADBREW_CODEBASE_PATH}/db/:/data/db maps a directory from the host to /data/db in the container, where MongoDB stores its data.
    6. command: Runs the command /usr/bin/mongod --bind_ip 0.0.0.0 to start the MongoDB server, binding it to all network interfaces.
+
+   ## Abstraction
+
+   I have implemented Abstraction in the `api` container by separating logic into `layers`. A brief description about each of these layers:
+
+   <b>1. Configuration Layer (config.py)</b>
+
+   Function:
+
+   Centralizes configuration settings for the application.
+   Provides a single source of truth for configuration values, making it easier to manage and modify these settings without touching other parts of the codebase.
+
+   Details:
+
+   The Config class contains configuration settings such as the MongoDB URI, database name, and collection name. These settings are used across various layers to ensure consistency and ease of maintenance.
+
+   <b>2. Error Handling Layer (exceptions.py)</b>
+
+   Function:
+
+   Defines custom exceptions to represent specific error conditions.
+   Provides a way to handle and propagate errors in a consistent manner across the application.
+
+   Details:
+
+   The DatabaseError class is a custom exception used to indicate errors related to database operations. It extends the base Exception class and allows for more meaningful error messages and error handling.
+
+   <b>3. Repository Layer (repositories.py)</b>
+
+   Function:
+
+   Manages direct interactions with the database.
+   Encapsulates database access, making it easier to swap out the database implementation if needed.
+
+   Details:
+
+   The TodoRepository class contains methods for performing CRUD operations on the todos collection in MongoDB.
+   This layer uses the configuration settings from Config and raises DatabaseError for any database operation failures.
+
+   <b>4. Service Layer (services.py)</b>
+
+   Function:
+
+   Contains business logic and higher-level operations.
+   Acts as an intermediary between the view layer and the repository layer.
+
+   Details:
+
+   The TodoService class uses methods from the TodoRepository to fetch and insert todo items.
+   Handles the conversion of \_id fields to strings for JSON serialization and re-raises DatabaseError exceptions to be handled by the view layer.
+
+   <b>5. View Layer (views.py)</b>
+
+   Function:
+
+   Handles HTTP requests and responses.
+   Interacts with the service layer to perform application logic and return appropriate HTTP responses.
+
+   Details:
+
+   The TodoListView class is a Django REST framework view that defines get and post methods for handling GET and POST requests.
+   It calls methods from the TodoService to perform operations and handles DatabaseError exceptions by logging the errors and returning appropriate error responses to the client.
